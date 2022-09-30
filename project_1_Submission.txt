@@ -1,0 +1,299 @@
+This is a real time dataset of the ineuron technical consultant team. You have to perform hive analysis on this given dataset.
+
+Download Dataset 1 - https://drive.google.com/file/d/1WrG-9qv6atP-W3P_-gYln1hHyFKRKMHP/view
+
+Download Dataset 2 - https://drive.google.com/file/d/1-JIPCZ34dyN6k9CqJa-Y8yxIGq6vTVXU/view
+
+Note: both files are csv files. 
+
+
+
+
+1. Create a schema based on the given dataset
+
+hive> create table AgentLogin
+    > (SL_no int,
+    >  Agent string,
+    > Date string,
+    > Login_time string,
+    > Logout_time string,
+    > Duration string
+    > )
+    >  row format delimited
+    > fields terminated by ','
+    > TBLPROPERTIES ("skip.header.line.count"="1");
+
+hive> create table AgentPerformance
+    > (
+    > SL_no int,
+    > Date string,
+    > Agent_Name string,
+    > Total_Chats int,
+    > Average_Response_Time string,
+    > Average_Resolution_Time string,
+    > Average_Rating float,
+    > Total_Feedback int
+    > )
+    > row format delimited
+    > fields terminated by ','
+    > TBLPROPERTIES ("skip.header.line.count"="1");
+
+
+
+********************************************************************************************************************************************************
+2. Dump the data inside the hdfs in the given schema location.
+
+hive> load data local inpath 'file:///tmp/hive_exp2/AgentLogingReport.csv' into table AgentLogin;
+hive> load data local inpath 'file:///tmp/hive_exp2/AgentPerformance.csv' into table AgentPerformance;
+hive> set hive.cli.print.header=true;
+hive> select * from AgentLogin limit 5;
+hive> select * from AgentPerformance limit 5;
+
+
+
+********************************************************************************************************************************************************
+3. List of all agents' names.
+
+hive> select agent_name from agentperformance;
+OK
+agent_name
+Prerna Singh
+Nandani Gupta
+Ameya Jain
+Mahesh Sarade
+Swati
+
+
+******************************************************************************************************************************************************** 
+4. Find out agent average rating.
+
+hive> select agent_name,average_rating from agentperformance;
+OK
+agent_name      average_rating
+Prerna Singh    4.11
+Nandani Gupta   3.14
+Ameya Jain      4.55
+Mahesh Sarade   4.71
+Swati           3.67
+
+
+*********************************************************************************************************************************************************
+5. Total working days for each agents 
+
+hive> select agent,duration from agentlogin;
+OK
+agent                   duration
+Shivananda Sonwane      02:04:10
+Khushboo Priya          00:00:17
+Nandani Gupta           02:26:42
+Hrisikesh Neogi         00:45:06
+Mukesh                  01:08:36
+
+
+**********************************************************************************************************************************************************
+6. Total query that each agent have taken 
+
+hive> select agent_name,total_chats from agentperformance;
+OK
+agent_name      total_chats
+Prerna Singh    11
+Nandani Gupta   11
+Ameya Jain      14
+Mahesh Sarade   14
+Swati           14
+
+
+**********************************************************************************************************************************************************
+7. Total Feedback that each agent have received 
+
+hive> select agent_name,total_feedback from agentperformance;
+OK
+agent_name      total_feedback
+Prerna Singh    9
+Nandani Gupta   7
+Ameya Jain      11
+Mahesh Sarade   7
+Swati           6
+
+
+**********************************************************************************************************************************************************
+8. Agent name who have average rating between 3.5 to 4
+
+hive> select agent_name,average_rating from agentperformance
+    > where average_rating between 3.5 and 4;
+   
+OK
+agent_name              average_rating
+Swati                   3.67
+Manjunatha A            3.6
+Boktiar Ahmed Bappy     4.0
+Prateek _iot            3.75
+Nandani Gupta           3.79
+Jaydeep Dixit           3.95
+Mahesh Sarade           3.94
+Zeeshan                 3.79
+Hrisikesh Neogi         3.77
+Muskan Garg             4.0
+ 
+
+**********************************************************************************************************************************************************
+9. Agent name who have rating less than 3.5 
+
+hive> select agent_name,average_rating from agentperformance
+    > where average_rating < 3.5;
+
+OK
+agent_name       average_rating
+Nandani Gupta    3.14
+Hitesh Choudhary 0.0
+Sanjeevan        0.0
+Anirudh          0.0
+Shiva Srivastava 0.0
+Dibyanshu        0.0
+Ashish           0.0
+Uday Mishra      0.0
+Aditya Shinde    0.0
+Jayant Kumar     0.0
+
+
+**********************************************************************************************************************************************************
+10. Agent name who have rating more than 4.5 
+
+hive> select agent_name, average_rating from agentperformance
+    > where average_rating > 4.5;
+
+OK
+agent_name              average_rating
+Ameya Jain              4.55
+Mahesh Sarade           4.71
+Mukesh                  4.62
+Saikumarreddy N         5.0
+Sanjeev Kumar           5.0
+Harikrishnan Shaji      4.57
+Sowmiya Sivakumar       4.75
+Boktiar Ahmed Bappy     4.75
+Shivananda Sonwane      5.0
+Ishawant Kumar          4.67
+Deepranjan Gupta        4.8
+Shivananda Sonwane      4.67
+Muskan Garg             5.0
+Aditya_iot              4.6
+Mukesh                  4.67
+
+
+**********************************************************************************************************************************************************
+11. How many feedback agents have received more than 4.5 average
+
+hive> select count(total_feedback) as Feedback from agentperformance
+    > where total_feedback >4.5;
+
+OK
+feedback
+621
+
+
+**********************************************************************************************************************************************************
+12. average weekly response time for each agent 
+
+hive> select agent_name,average_response_time from agentperformance;
+  
+OK
+agent_name      average_response_time
+Prerna Singh    0:00:38
+Nandani Gupta   0:01:15
+Ameya Jain      0:00:30
+Mahesh Sarade   0:01:04
+Swati           0:01:11
+Mukesh          0:00:34
+Saikumarreddy N 0:00:31
+Sanjeev Kumar   0:00:55
+Shubham Sharma  0:01:31
+Nishtha Jain    0:00:59
+
+
+**********************************************************************************************************************************************************
+13. average weekly resolution time for each agents 
+
+hive> select agent_name,average_resolution_time from agentperformance;
+    
+OK
+agent_name      average_resolution_time
+Prerna Singh    0:04:20
+Nandani Gupta   0:28:25
+Ameya Jain      0:11:36
+Mahesh Sarade   0:15:46
+Swati           0:16:33
+
+
+**********************************************************************************************************************************************************
+14. Find the number of chat on which they have received a feedback
+
+hive> select agent_name,total_chats from agentperformance
+    > where total_feedback > 0
+  
+OK
+agent_name      total_chats
+Prerna Singh    11
+Nandani Gupta   11
+Ameya Jain      14
+Mahesh Sarade   14
+Swati           14
+
+
+********************************************************************************************************************************************************** 
+15. Total contribution hour for each and every agents weekly basis
+
+hive> select agent,duration from agentlogin;
+    
+OK
+agent                   duration
+Shivananda Sonwane      02:04:10
+Khushboo Priya          00:00:17
+Nandani Gupta           02:26:42
+Hrisikesh Neogi         00:45:06
+Mukesh                  01:08:36
+
+
+********************************************************************************************************************************************************** 
+16. Perform inner join, left join and right join based on the agent column and after joining the table export that data into your local system.
+
+# INNER JOIN
+
+hive> INSERT OVERWRITE LOCAL DIRECTORY '/home/cloudera/test_1'
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY ','
+    > select * from agentlogin join agentperformance on agent = agent_name;
+
+
+
+# LEFT JOIN
+
+hive> INSERT OVERWRITE LOCAL DIRECTORY '/home/cloudera/test_2'
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY ','
+    > select * from agentlogin left join agentperformance on agent = agent_name;
+
+
+# RIGHT JOIN
+
+hive> INSERT OVERWRITE LOCAL DIRECTORY '/home/cloudera/test_3'
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY ','
+    > select * from agentlogin right join agentperformance on agent = agent_name;
+
+
+
+
+
+*********************************************************************************************************************************************************
+
+17. Perform partitioning on top of the agent column and then on top of that perform bucketing for each partitioning.
+
+hive> create table part_agent
+    > ( sl_no int, date string, login_time string, logout_time string, duration string )
+    > partitioned by (agent string)
+    > clustered by(sl_no) into 100 buckets
+    > row format delimited
+    > fields terminated by ',';
+
+hive> insert overwrite table part_agent  partition(agent) select * from agentlogin;
